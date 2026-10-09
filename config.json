@@ -3,8 +3,24 @@
   "vendedor_usuario": "ch3r0ky",
   "moneda": "USD",
   "pagos": {
-    "al_recibir": {"activo": true, "texto": "Pagar al recibir / Zelle"},
-    "tarjeta": {"activo": false, "api_url": ""},
-    "ton": {"activo": false, "wallet": "GRAM_WALLET_ADDRESS", "usd_por_ton": 3.0}
+    "al_recibir": {
+      "activo": true,
+      "texto": "Pagar al recibir / Zelle"
+    },
+    "transferencia_hn": {
+      "activo": true,
+      "texto": "Transferencia o Tigo Money (Honduras)",
+      "instrucciones": "Te mando los datos de la cuenta por este chat",
+      "lempiras_por_usd": 26.0
+    },
+    "tarjeta": {
+      "activo": false,
+      "api_url": ""
+    },
+    "ton": {
+      "activo": false,
+      "wallet": "GRAM_WALLET_ADDRESS",
+      "usd_por_ton": 3.0
+    }
   }
 }

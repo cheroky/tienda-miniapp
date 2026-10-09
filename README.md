@@ -17,10 +17,23 @@ No necesita servidor ni bot: es una página fija en GitHub Pages.
 | Opción | Estado | Qué falta |
 |---|---|---|
 | 💵 Pagar al recibir / Zelle | **Funciona ya** | Nada |
+| 🇭🇳 Transferencia o Tigo Money (Honduras) | **Funciona ya** | Opcional: poner tus datos de cuenta y el cambio |
 | 💳 Tarjeta (Telegram Payments + Stripe) | Sale como "Pronto" | Bot nuevo + Stripe + servidor (ver abajo) |
 | 💎 Gram / TON | Sale como "Pronto" | Poner tu dirección de billetera en `config.json` |
 
 **Estrellas de Telegram (⭐) no se usan:** las reglas de Telegram solo permiten Estrellas para cosas digitales. Para ropa y artículos físicos está prohibido, así que la tienda no las ofrece.
+
+### Transferencia o Tigo Money (Honduras)
+El cliente ve el total también en lempiras (aprox.) y te llega el pedido con la línea
+`Pago: Transferencia / Tigo Money (Honduras) — total aprox. L …` y `Manda la foto del comprobante en este chat`.
+Antes de entregar, revisa que te llegó el dinero.
+
+Todo se cambia en `config.json`, dentro de `"transferencia_hn"` (en GitHub: toca el archivo › ✏️ › Commit changes):
+- **Datos de tu cuenta:** cambia `"instrucciones"`. Por ahora dice `Te mando los datos de la cuenta por este chat`. Puedes poner tus datos reales, por ejemplo:
+  `"instrucciones": "BAC Honduras, cuenta 123456789 a nombre de Piero Castro · Tigo Money 9999-9999"`
+  (Lo que pongas ahí lo ve cualquiera que abra la tienda.)
+- **Cambio del lempira:** cambia `"lempiras_por_usd": 26.0` por el cambio del día (por ejemplo `26.4`). Usa punto, no coma.
+- **Quitarla:** pon `"activo": false`.
 
 ### Activar Gram / TON
 1. Copia la dirección de tu billetera (Wallet de Telegram › TON › Recibir, o Tonkeeper).

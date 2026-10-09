@@ -202,6 +202,8 @@ function pintarCarrito(){
 /* ---------- Pago ---------- */
 const P = () => CONFIG.pagos || {};
 const tarjetaLista = () => !!(P().tarjeta && P().tarjeta.activo && P().tarjeta.api_url);
+const hnLista = () => !!(P().transferencia_hn && P().transferencia_hn.activo);
+const lempiras = () => "L " + Math.round(total() * ((P().transferencia_hn || {}).lempiras_por_usd || 26)).toLocaleString("en-US");
 const tonLista = () => !!(P().ton && P().ton.activo && P().ton.wallet && P().ton.wallet !== "GRAM_WALLET_ADDRESS");
 let metodo = "al_recibir", datos = {nota:"", tel:""};
 
@@ -219,6 +221,7 @@ function abrirPago(){
     <label>¿Cómo quieres pagar?</label>
     <div class="sec">
       ${op("al_recibir", "💵 " + esc((P().al_recibir||{}).texto || "Pagar al recibir / Zelle"), "Te escribimos para coordinar el pago y la entrega", true)}
+      ${hnLista() ? op("transferencia_hn", "🇭🇳 " + esc(P().transferencia_hn.texto || "Transferencia o Tigo Money (Honduras)"), `Total aprox. ${lempiras()} · ${esc(P().transferencia_hn.instrucciones || "")}`, true) : ""}
       ${op("tarjeta", "💳 Tarjeta", "Pago seguro dentro de Telegram", tarjetaLista())}
       ${op("ton", "💎 Gram / TON", "Desde tu billetera de Telegram o Tonkeeper", tonLista())}
     </div>
@@ -230,7 +233,7 @@ function abrirPago(){
   $("hojaCuerpo").querySelectorAll('input[name=m]').forEach(r => r.onchange = () => { metodo = r.value; $("extra").innerHTML = ""; boton(textoBoton(), confirmar); });
   boton(textoBoton(), confirmar);
 }
-const textoBoton = () => metodo === "tarjeta" ? `Pagar ${usd(total())}` : metodo === "ton" ? "Pagar con Gram / TON" : "Enviar pedido";
+const textoBoton = () => metodo === "transferencia_hn" ? `Enviar pedido · aprox. ${lempiras()}` : metodo === "tarjeta" ? `Pagar ${usd(total())}` : metodo === "ton" ? "Pagar con Gram / TON" : "Enviar pedido";
 
 function cliente(){
   const u = enTelegram && tg.initDataUnsafe && tg.initDataUnsafe.user;
@@ -238,7 +241,7 @@ function cliente(){
   return [u.first_name, u.last_name].filter(Boolean).join(" ") + (u.username ? ` (@${u.username})` : "") + ` · id ${u.id}`;
 }
 
-function textoPedido(pago){
+function textoPedido(pago, extras){
   return [
     `🛍️ Pedido ${pedidoId}`,
     ...lineas().map(({p,n}) => `• ${n} × ${p.nombre} — talla ${p.talla} — ${usd(p.precio*n)}`),
@@ -246,12 +249,13 @@ function textoPedido(pago){
     `Pago: ${pago}`,
     `Cliente: ${cliente()}`,
     datos.tel.trim() ? `Teléfono: ${datos.tel.trim()}` : "",
-    datos.nota.trim() ? `Nota: ${datos.nota.trim()}` : ""
+    datos.nota.trim() ? `Nota: ${datos.nota.trim()}` : "",
+    ...(extras || [])
   ].filter(Boolean).join("\n");
 }
 
-function mandarAlVendedor(pago){
-  const url = `https://t.me/${CONFIG.vendedor_usuario || "ch3r0ky"}?text=` + encodeURIComponent(textoPedido(pago));
+function mandarAlVendedor(pago, extras){
+  const url = `https://t.me/${CONFIG.vendedor_usuario || "ch3r0ky"}?text=` + encodeURIComponent(textoPedido(pago, extras));
   limpiar();
   abrirTG(url);
 }
@@ -262,6 +266,10 @@ function confirmar(){
   if (metodo === "al_recibir") {
     const ok = () => mandarAlVendedor((P().al_recibir||{}).texto || "Pagar al recibir / Zelle");
     if (enTelegram && tg.showConfirm) tg.showConfirm("Se abrirá el chat con el vendedor con tu pedido ya escrito. Solo toca Enviar ➤.", y => y && ok());
+    else ok();
+  } else if (metodo === "transferencia_hn") {
+    const ok = () => mandarAlVendedor(`Transferencia / Tigo Money (Honduras) — total aprox. ${lempiras()}`, ["Manda la foto del comprobante en este chat"]);
+    if (enTelegram && tg.showConfirm) tg.showConfirm(`Total aprox. ${lempiras()}. Se abrirá el chat con el vendedor con tu pedido ya escrito. Toca Enviar ➤ y después manda la foto del comprobante.`, y => y && ok());
     else ok();
   } else if (metodo === "tarjeta") pagarTarjeta();
   else if (metodo === "ton") pagarTon();
