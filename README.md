@@ -1,4 +1,4 @@
-# Tienda (mini app de Telegram)
+# Mi tiendita HN (mini app de Telegram)
 
 Tienda sencilla para vender artículos de segunda mano (ropa, zapatos, carteras, fajas, chancletas) dentro de Telegram.
 
@@ -70,7 +70,7 @@ El bot verifica que el pedido viene de Telegram, calcula el total con `products.
 
 Borra los 8 artículos que dicen "(Ejemplo)" y sus fotos `fotos/ejemplo-*.svg` cuando pongas los tuyos.
 
-**Siguiente paso posible:** un bot donde le mandas una foto con el precio y la talla, y él agrega el artículo solo, sin editar archivos.
+**Más fácil:** desde el bot **@mitienditahn_bot** mándale una foto con el texto `Blusa roja, M, $10, Ropa` y la agrega solo (cuando el bot esté activado). Con /productos marcas vendido, cambias precio o borras.
 
 ## Archivos
 - `index.html` — la tienda.
