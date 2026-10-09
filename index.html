@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tienda</title>
+<title>Mi tiendita HN</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   :root{
@@ -81,7 +81,7 @@
 </head>
 <body>
 <header>
-  <div><h1 id="titulo">Tienda</h1><p class="sub">Artículos de segunda mano · precios en USD</p></div>
+  <div><h1 id="titulo">Mi tiendita HN</h1><p class="sub">Artículos de segunda mano · precios en USD</p></div>
   <button class="carrito-btn" id="btnCarrito">🛒 <span id="nCarrito">0</span></button>
 </header>
 <div class="chips" id="chips"></div>
@@ -116,7 +116,7 @@ async function cargar(){
     fetch("products.json" + v).then(r => r.json()),
     fetch("config.json" + v).then(r => r.json())
   ]);
-  $("titulo").textContent = CONFIG.tienda || "Tienda";
+  $("titulo").textContent = CONFIG.tienda || "Mi tiendita HN";
   try { carrito = JSON.parse(localStorage.getItem("carrito") || "{}"); } catch(e){ carrito = {}; }
   for (const id in carrito) if (!PRODUCTOS.find(p => p.id === id)) delete carrito[id];
   pintarChips(); pintarGrid(); actualizar();
