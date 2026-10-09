@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tienda</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root{
+    --bg: var(--tg-theme-bg-color, #ffffff);
+    --bg2: var(--tg-theme-secondary-bg-color, #f2f2f7);
+    --txt: var(--tg-theme-text-color, #000000);
+    --hint: var(--tg-theme-hint-color, #6d6d72);
+    --link: var(--tg-theme-link-color, #2481cc);
+    --btn: var(--tg-theme-button-color, #2481cc);
+    --btntxt: var(--tg-theme-button-text-color, #ffffff);
+    --card: var(--tg-theme-section-bg-color, var(--bg));
+    --sep: var(--tg-theme-section-separator-color, rgba(128,128,128,.25));
+    --red: var(--tg-theme-destructive-text-color, #e53935);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg: var(--tg-theme-bg-color,#1c1c1e); --bg2: var(--tg-theme-secondary-bg-color,#000);
+      --txt: var(--tg-theme-text-color,#fff); --hint: var(--tg-theme-hint-color,#8e8e93);
+      --card: var(--tg-theme-section-bg-color,#1c1c1e); }
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg2);color:var(--txt);
+    font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding:14px 14px calc(90px + env(safe-area-inset-bottom));}
+  button{font:inherit;cursor:pointer}
+  header{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 12px}
+  h1{font-size:24px;margin:0}
+  .sub{color:var(--hint);font-size:13px;margin:2px 0 0}
+  .carrito-btn{border:0;border-radius:12px;padding:10px 14px;background:var(--btn);color:var(--btntxt);font-weight:700;font-size:15px}
+  .chips{display:flex;gap:8px;overflow-x:auto;margin:0 -14px 14px;padding:0 14px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chips button{flex:0 0 auto;border:0;border-radius:18px;padding:8px 14px;font-size:14px;font-weight:600;background:var(--card);color:var(--txt)}
+  .chips button.on{background:var(--btn);color:var(--btntxt)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .prod{background:var(--card);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+  .prod img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:var(--bg2)}
+  .info{padding:10px 10px 12px;display:flex;flex-direction:column;gap:3px;flex:1}
+  .nom{font-weight:600;font-size:15px;line-height:1.25;min-height:2.5em}
+  .meta{color:var(--hint);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .precio{font-size:18px;font-weight:700;margin-top:2px}
+  .add{margin-top:auto;border:0;border-radius:10px;padding:10px 0;width:100%;background:var(--btn);color:var(--btntxt);font-weight:700;font-size:15px}
+  .add.en{background:var(--bg2);color:var(--link)}
+  .add:disabled{opacity:.5}
+  .vacio{text-align:center;color:var(--hint);padding:30px 0}
+  /* Hojas (carrito y pago) */
+  .velo{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:10}
+  .hoja{position:fixed;left:0;right:0;bottom:0;max-height:88vh;overflow-y:auto;background:var(--bg2);
+    border-radius:18px 18px 0 0;padding:16px 14px calc(90px + env(safe-area-inset-bottom));display:none;z-index:11}
+  .hoja h2{font-size:20px;margin:0 2px 12px;display:flex;justify-content:space-between;align-items:center}
+  .x{border:0;background:var(--card);color:var(--txt);border-radius:16px;width:32px;height:32px;font-size:16px}
+  .sec{background:var(--card);border-radius:14px;padding:4px 12px;margin-bottom:12px}
+  .fila{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--sep)}
+  .fila:last-child{border-bottom:0}
+  .fila img{width:48px;height:48px;border-radius:10px;object-fit:cover}
+  .fila .t{flex:1;min-width:0}
+  .fila .t b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cant{display:flex;align-items:center;gap:8px}
+  .cant button{border:0;width:30px;height:30px;border-radius:15px;background:var(--bg2);color:var(--link);font-size:18px;font-weight:700}
+  .total{display:flex;justify-content:space-between;font-size:17px;font-weight:700;padding:12px 2px}
+  label{display:block;font-size:13px;color:var(--hint);margin:10px 2px 4px}
+  input,textarea{width:100%;border:1px solid var(--sep);border-radius:10px;padding:10px;font:inherit;background:var(--card);color:var(--txt)}
+  textarea{min-height:60px;resize:vertical}
+  .pago{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--sep)}
+  .pago:last-child{border-bottom:0}
+  .pago input{width:20px;height:20px;accent-color:var(--btn)}
+  .pago .t{flex:1}
+  .pago small{display:block;color:var(--hint);font-size:12px}
+  .pronto{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--bg2);color:var(--hint)}
+  .pago.off{opacity:.55}
+  .aviso{background:var(--card);border-radius:14px;padding:12px;font-size:14px;margin-bottom:12px}
+  .aviso button{margin-top:8px;width:100%;border:0;border-radius:10px;padding:11px 0;background:var(--btn);color:var(--btntxt);font-weight:700}
+  .aviso button.sec2{background:var(--bg2);color:var(--link)}
+  .barra{position:fixed;left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));border:0;border-radius:12px;
+    padding:14px 0;background:var(--btn);color:var(--btntxt);font-weight:700;font-size:16px;display:none;z-index:12}
+</style>
+</head>
+<body>
+<header>
+  <div><h1 id="titulo">Tienda</h1><p class="sub">Artículos de segunda mano · precios en USD</p></div>
+  <button class="carrito-btn" id="btnCarrito">🛒 <span id="nCarrito">0</span></button>
+</header>
+<div class="chips" id="chips"></div>
+<div class="grid" id="grid"></div>
+
+<div class="velo" id="velo"></div>
+<div class="hoja" id="hoja">
+  <h2><span id="hojaTitulo">Tu carrito</span><button class="x" id="cerrar">✕</button></h2>
+  <div id="hojaCuerpo"></div>
+</div>
+<button class="barra" id="barra">Hacer pedido</button>
+
+<script>
+const tg = window.Telegram && window.Telegram.WebApp;
+const enTelegram = !!(tg && tg.initData);
+if (tg) { tg.ready(); tg.expand(); }
+const CATEGORIAS = ["Todo","Ropa","Zapatos","Carteras","Fajas","Chancletas"];
+let PRODUCTOS = [], CONFIG = {}, cat = "Todo", vista = "tienda", carrito = {}; // carrito: id -> cantidad
+let pedidoId = "";
+const $ = id => document.getElementById(id);
+const usd = n => "$" + Number(n).toFixed(2).replace(/\.00$/, "");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const vibra = t => { try { tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred(t || "light"); } catch(e){} };
+
+function abrirTG(url){ if (enTelegram && tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url, "_blank"); }
+function abrirLink(url){ if (enTelegram && tg.openLink) tg.openLink(url); else window.location.href = url; }
+function alerta(msg){ if (enTelegram && tg.showAlert) tg.showAlert(msg); else alert(msg); }
+
+async function cargar(){
+  const v = "?v=" + Date.now();
+  [PRODUCTOS, CONFIG] = await Promise.all([
+    fetch("products.json" + v).then(r => r.json()),
+    fetch("config.json" + v).then(r => r.json())
+  ]);
+  $("titulo").textContent = CONFIG.tienda || "Tienda";
+  try { carrito = JSON.parse(localStorage.getItem("carrito") || "{}"); } catch(e){ carrito = {}; }
+  for (const id in carrito) if (!PRODUCTOS.find(p => p.id === id)) delete carrito[id];
+  pintarChips(); pintarGrid(); actualizar();
+}
+
+function pintarChips(){
+  $("chips").innerHTML = CATEGORIAS.map(c => `<button data-c="${c}" class="${c===cat?"on":""}">${c}</button>`).join("");
+  $("chips").querySelectorAll("button").forEach(b => b.onclick = () => { cat = b.dataset.c; vibra(); pintarChips(); pintarGrid(); });
+}
+
+function pintarGrid(){
+  const lista = PRODUCTOS.filter(p => cat === "Todo" || p.categoria === cat);
+  if (!lista.length) { $("grid").innerHTML = `<div class="vacio" style="grid-column:1/-1">No hay artículos en ${esc(cat)} por ahora.</div>`; return; }
+  $("grid").innerHTML = lista.map(p => {
+    const n = carrito[p.id] || 0, agotado = (p.disponibles ?? 1) <= 0;
+    return `<div class="prod">
+      <img src="${esc(p.foto)}" alt="${esc(p.nombre)}" loading="lazy">
+      <div class="info">
+        <div class="nom">${esc(p.nombre)}</div>
+        <div class="meta">Talla: ${esc(p.talla)}</div>
+        <div class="meta">${esc(p.estado || "Segunda mano")}</div>
+        <div class="precio">${usd(p.precio)}</div>
+        <button class="add ${n?"en":""}" data-id="${p.id}" ${agotado?"disabled":""}>${agotado?"Agotado":(n?`En carrito (${n}) +`:"Agregar")}</button>
+      </div></div>`;
+  }).join("");
+  $("grid").querySelectorAll(".add").forEach(b => b.onclick = () => cambiar(b.dataset.id, +1));
+}
+
+function cambiar(id, d){
+  const p = PRODUCTOS.find(x => x.id === id); if (!p) return;
+  const max = p.disponibles ?? 1, n = (carrito[id] || 0) + d;
+  if (n > max) { alerta(`Solo hay ${max} de "${p.nombre}".`); return; }
+  if (n <= 0) delete carrito[id]; else carrito[id] = n;
+  vibra(); localStorage.setItem("carrito", JSON.stringify(carrito));
+  pintarGrid(); actualizar(); if (vista === "carrito") pintarCarrito();
+}
+
+const lineas = () => Object.entries(carrito).map(([id,n]) => ({p: PRODUCTOS.find(x => x.id === id), n})).filter(l => l.p);
+const total = () => lineas().reduce((s,l) => s + l.p.precio * l.n, 0);
+const piezas = () => lineas().reduce((s,l) => s + l.n, 0);
+
+/* Botón principal: el de Telegram si estamos dentro, si no uno propio */
+let accionPrincipal = null;
+function boton(texto, accion){
+  accionPrincipal = accion;
+  if (enTelegram) {
+    if (texto) { tg.MainButton.setText(texto); tg.MainButton.show(); } else tg.MainButton.hide();
+  } else {
+    $("barra").textContent = texto || ""; $("barra").style.display = texto ? "block" : "none";
+  }
+}
+if (tg) tg.MainButton.onClick(() => accionPrincipal && accionPrincipal());
+$("barra").onclick = () => accionPrincipal && accionPrincipal();
+
+function actualizar(){
+  $("nCarrito").textContent = piezas();
+  if (vista === "tienda") boton(piezas() ? `Ver carrito · ${usd(total())}` : "", abrirCarrito);
+}
+
+function abrirHoja(titulo){ $("hojaTitulo").textContent = titulo; $("velo").style.display = "block"; $("hoja").style.display = "block"; $("hoja").scrollTop = 0;
+  if (tg && tg.BackButton) tg.BackButton.show(); }
+function cerrarHoja(){ $("velo").style.display = "none"; $("hoja").style.display = "none"; vista = "tienda";
+  if (tg && tg.BackButton) tg.BackButton.hide(); actualizar(); }
+$("cerrar").onclick = cerrarHoja; $("velo").onclick = cerrarHoja;
+if (tg && tg.BackButton) tg.BackButton.onClick(() => vista === "pago" ? abrirCarrito() : cerrarHoja());
+$("btnCarrito").onclick = abrirCarrito;
+
+function abrirCarrito(){ vista = "carrito"; abrirHoja("Tu carrito"); pintarCarrito(); }
+
+function pintarCarrito(){
+  const ls = lineas();
+  if (!ls.length) { $("hojaCuerpo").innerHTML = `<div class="vacio">Tu carrito está vacío.</div>`; boton("", null); return; }
+  $("hojaCuerpo").innerHTML = `<div class="sec">${ls.map(({p,n}) => `
+    <div class="fila"><img src="${esc(p.foto)}" alt="">
+      <div class="t"><b>${esc(p.nombre)}</b><span class="meta">Talla ${esc(p.talla)} · ${usd(p.precio)} c/u</span></div>
+      <div class="cant"><button data-id="${p.id}" data-d="-1">−</button><b>${n}</b><button data-id="${p.id}" data-d="1">+</button></div>
+    </div>`).join("")}</div>
+    <div class="total"><span>Total</span><span>${usd(total())}</span></div>`;
+  $("hojaCuerpo").querySelectorAll(".cant button").forEach(b => b.onclick = () => cambiar(b.dataset.id, +b.dataset.d));
+  boton("Hacer pedido", abrirPago);
+}
+
+/* ---------- Pago ---------- */
+const P = () => CONFIG.pagos || {};
+const tarjetaLista = () => !!(P().tarjeta && P().tarjeta.activo && P().tarjeta.api_url);
+const tonLista = () => !!(P().ton && P().ton.activo && P().ton.wallet && P().ton.wallet !== "GRAM_WALLET_ADDRESS");
+let metodo = "al_recibir", datos = {nota:"", tel:""};
+
+function abrirPago(){
+  vista = "pago"; abrirHoja("Hacer pedido");
+  if (!pedidoId) pedidoId = "P" + Date.now().toString(36).toUpperCase().slice(-6);
+  const op = (id, titulo, desc, lista) => `
+    <label class="pago ${lista?"":"off"}" style="margin:0;color:var(--txt);font-size:15px">
+      <input type="radio" name="m" value="${id}" ${metodo===id?"checked":""} ${lista?"":"disabled"}>
+      <span class="t">${titulo}<small>${desc}</small></span>${lista?"":'<span class="pronto">Pronto</span>'}
+    </label>`;
+  $("hojaCuerpo").innerHTML = `
+    <div class="sec">${lineas().map(({p,n}) => `<div class="fila"><div class="t"><b>${n} × ${esc(p.nombre)}</b><span class="meta">Talla ${esc(p.talla)}</span></div><b>${usd(p.precio*n)}</b></div>`).join("")}</div>
+    <div class="total"><span>Total</span><span>${usd(total())}</span></div>
+    <label>¿Cómo quieres pagar?</label>
+    <div class="sec">
+      ${op("al_recibir", "💵 " + esc((P().al_recibir||{}).texto || "Pagar al recibir / Zelle"), "Te escribimos para coordinar el pago y la entrega", true)}
+      ${op("tarjeta", "💳 Tarjeta", "Pago seguro dentro de Telegram", tarjetaLista())}
+      ${op("ton", "💎 Gram / TON", "Desde tu billetera de Telegram o Tonkeeper", tonLista())}
+    </div>
+    <label for="tel">Teléfono (opcional)</label><input id="tel" type="tel" inputmode="tel" placeholder="Ej. 555 123 4567" value="${esc(datos.tel)}">
+    <label for="nota">Nota (opcional)</label><textarea id="nota" placeholder="Dirección, hora para entregar, colores…">${esc(datos.nota)}</textarea>
+    <div id="extra"></div>`;
+  $("tel").oninput = e => datos.tel = e.target.value;
+  $("nota").oninput = e => datos.nota = e.target.value;
+  $("hojaCuerpo").querySelectorAll('input[name=m]').forEach(r => r.onchange = () => { metodo = r.value; $("extra").innerHTML = ""; boton(textoBoton(), confirmar); });
+  boton(textoBoton(), confirmar);
+}
+const textoBoton = () => metodo === "tarjeta" ? `Pagar ${usd(total())}` : metodo === "ton" ? "Pagar con Gram / TON" : "Enviar pedido";
+
+function cliente(){
+  const u = enTelegram && tg.initDataUnsafe && tg.initDataUnsafe.user;
+  if (!u) return "(no disponible)";
+  return [u.first_name, u.last_name].filter(Boolean).join(" ") + (u.username ? ` (@${u.username})` : "") + ` · id ${u.id}`;
+}
+
+function textoPedido(pago){
+  return [
+    `🛍️ Pedido ${pedidoId}`,
+    ...lineas().map(({p,n}) => `• ${n} × ${p.nombre} — talla ${p.talla} — ${usd(p.precio*n)}`),
+    `Total: ${usd(total())}`,
+    `Pago: ${pago}`,
+    `Cliente: ${cliente()}`,
+    datos.tel.trim() ? `Teléfono: ${datos.tel.trim()}` : "",
+    datos.nota.trim() ? `Nota: ${datos.nota.trim()}` : ""
+  ].filter(Boolean).join("\n");
+}
+
+function mandarAlVendedor(pago){
+  const url = `https://t.me/${CONFIG.vendedor_usuario || "ch3r0ky"}?text=` + encodeURIComponent(textoPedido(pago));
+  limpiar();
+  abrirTG(url);
+}
+function limpiar(){ carrito = {}; localStorage.removeItem("carrito"); pedidoId = ""; datos = {nota:"", tel:""}; metodo = "al_recibir"; cerrarHoja(); pintarGrid(); }
+
+function confirmar(){
+  if (!piezas()) return;
+  if (metodo === "al_recibir") {
+    const ok = () => mandarAlVendedor((P().al_recibir||{}).texto || "Pagar al recibir / Zelle");
+    if (enTelegram && tg.showConfirm) tg.showConfirm("Se abrirá el chat con el vendedor con tu pedido ya escrito. Solo toca Enviar ➤.", y => y && ok());
+    else ok();
+  } else if (metodo === "tarjeta") pagarTarjeta();
+  else if (metodo === "ton") pagarTon();
+}
+
+/* Tarjeta: el bot de pagos crea la factura (createInvoiceLink) y Telegram la muestra */
+async function pagarTarjeta(){
+  if (!enTelegram) { alerta("El pago con tarjeta solo funciona dentro de Telegram."); return; }
+  try {
+    tg.MainButton.showProgress();
+    const r = await fetch(P().tarjeta.api_url.replace(/\/$/, "") + "/factura", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({initData: tg.initData, pedido: pedidoId, items: lineas().map(({p,n}) => ({id: p.id, n})), telefono: datos.tel, nota: datos.nota})
+    });
+    const j = await r.json();
+    tg.MainButton.hideProgress();
+    if (!j.link) throw new Error(j.error || "sin link");
+    tg.openInvoice(j.link, estado => {
+      if (estado === "paid") { limpiar(); tg.showAlert("¡Pago recibido! El vendedor ya tiene tu pedido y te escribirá para la entrega."); }
+      else if (estado === "failed") tg.showAlert("El pago no se pudo completar. Intenta de nuevo o elige otra forma de pago.");
+    });
+  } catch(e) { tg.MainButton.hideProgress(); alerta("No se pudo iniciar el pago con tarjeta. Elige otra forma de pago."); }
+}
+
+/* Gram / TON: enlace de transferencia con monto y número de pedido en el comentario */
+async function pagarTon(){
+  let usdPorTon = P().ton.usd_por_ton || 0;
+  try {
+    const j = await fetch("https://tonapi.io/v2/rates?tokens=ton&currencies=usd").then(r => r.json());
+    const v = j && j.rates && j.rates.TON && j.rates.TON.prices && j.rates.TON.prices.USD;
+    if (v > 0) usdPorTon = v;
+  } catch(e) {}
+  if (!(usdPorTon > 0)) { alerta("No se pudo calcular el precio en TON. Elige otra forma de pago."); return; }
+  const ton = Math.ceil(total() / usdPorTon * 100) / 100;           // redondeado hacia arriba a 0.01
+  const nano = Math.round(ton * 1e9);
+  const w = P().ton.wallet, q = `amount=${nano}&text=${encodeURIComponent("Pedido " + pedidoId)}`;
+  const tonkeeper = `https://app.tonkeeper.com/transfer/${w}?${q}`;
+  const tonUri = `ton://transfer/${w}?${q}`;
+  $("extra").innerHTML = `<div class="aviso">
+      Paga <b>${ton} TON</b> (≈ ${usd(total())}) a la billetera del vendedor. El comentario <b>Pedido ${pedidoId}</b> ya va puesto.
+      <button id="tk">Abrir Tonkeeper</button>
+      <button class="sec2" id="tu">Abrir otra billetera (ton://)</button>
+      <button class="sec2" id="cp">Copiar dirección</button>
+    </div>`;
+  $("tk").onclick = () => abrirLink(tonkeeper);
+  $("tu").onclick = () => { window.location.href = tonUri; };
+  $("cp").onclick = () => { navigator.clipboard && navigator.clipboard.writeText(w); alerta("Dirección copiada. Pon " + ton + " TON y el comentario: Pedido " + pedidoId); };
+  boton("Ya pagué · enviar pedido", () => mandarAlVendedor(`Gram/TON ${ton} TON (comentario "Pedido ${pedidoId}") — revisar que llegó`));
+  $("extra").scrollIntoView({behavior: "smooth"});
+}
+
+cargar().catch(() => { $("grid").innerHTML = '<div class="vacio" style="grid-column:1/-1">No se pudieron cargar los artículos. Cierra y vuelve a abrir.</div>'; });
+</script>
+</body>
+</html>
