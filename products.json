@@ -1,0 +1,10 @@
+[
+  {"id": "p1", "nombre": "Blusa de flores (Ejemplo)", "categoria": "Ropa", "talla": "M", "precio": 8, "estado": "Segunda mano · como nueva", "foto": "fotos/ejemplo-blusa.svg", "disponibles": 1},
+  {"id": "p2", "nombre": "Jeans de mezclilla (Ejemplo)", "categoria": "Ropa", "talla": "30", "precio": 12, "estado": "Segunda mano · buen estado", "foto": "fotos/ejemplo-jeans.svg", "disponibles": 2},
+  {"id": "p3", "nombre": "Tenis deportivos (Ejemplo)", "categoria": "Zapatos", "talla": "8.5", "precio": 20, "estado": "Segunda mano · poco uso", "foto": "fotos/ejemplo-tenis.svg", "disponibles": 1},
+  {"id": "p4", "nombre": "Botas de cuero (Ejemplo)", "categoria": "Zapatos", "talla": "7", "precio": 25, "estado": "Segunda mano · buen estado", "foto": "fotos/ejemplo-botas.svg", "disponibles": 1},
+  {"id": "p5", "nombre": "Cartera café (Ejemplo)", "categoria": "Carteras", "talla": "Única", "precio": 15, "estado": "Segunda mano · como nueva", "foto": "fotos/ejemplo-cartera.svg", "disponibles": 1},
+  {"id": "p6", "nombre": "Bolso de mano (Ejemplo)", "categoria": "Carteras", "talla": "Única", "precio": 10, "estado": "Segunda mano · buen estado", "foto": "fotos/ejemplo-bolso.svg", "disponibles": 1},
+  {"id": "p7", "nombre": "Faja moldeadora (Ejemplo)", "categoria": "Fajas", "talla": "S", "precio": 18, "estado": "Segunda mano · poco uso", "foto": "fotos/ejemplo-faja.svg", "disponibles": 3},
+  {"id": "p8", "nombre": "Chancletas de playa (Ejemplo)", "categoria": "Chancletas", "talla": "9", "precio": 5, "estado": "Segunda mano · buen estado", "foto": "fotos/ejemplo-chancletas.svg", "disponibles": 4}
+]

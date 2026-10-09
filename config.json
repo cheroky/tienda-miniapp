@@ -1,0 +1,10 @@
+{
+  "tienda": "Tienda de Piero",
+  "vendedor_usuario": "ch3r0ky",
+  "moneda": "USD",
+  "pagos": {
+    "al_recibir": {"activo": true, "texto": "Pagar al recibir / Zelle"},
+    "tarjeta": {"activo": false, "api_url": ""},
+    "ton": {"activo": false, "wallet": "GRAM_WALLET_ADDRESS", "usd_por_ton": 3.0}
+  }
+}
